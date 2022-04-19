@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.easonhotel.dao.web.mapper.UserInfoMapper">
+    <select id="pageList" resultType="com.easonhotel.dao.web.vo.admin.VipUserAdminVo">
+        SELECT
+            web_user_info.`id`,
+            web_user_info.`openId`,
+            web_user_info.`phoneNumber`,
+            web_user_info.`email`,
+            web_user_info.`nickName`,
+            web_user_info.`realName`,
+            web_user_info.`balance`,
+            web_user_info.`createdAt`,
+            web_user_info.`deleted`,
+            web_user_point.`point`,
+            web_user_point.`level`
+        FROM
+            web_user_info
+        INNER JOIN web_user_point ON web_user_info.`id` = web_user_point.`userId`
+        <where>
+            <if test="param.phoneNumber != null and param.phoneNumber != ''">
+                web_user_info.`phoneNumber` = #{param.phoneNumber}
+            </if>
+            <if test="param.realName != null and param.realName != ''">
+                AND web_user_info.`realName` = #{param.realName}
+            </if>
+            <if test="param.level != null and param.level != ''">
+                AND web_user_point.`level` = #{param.level}
+            </if>
+            AND web_user_info.`deleted` = 0
+        </where>
+        ORDER BY web_user_info.`createdAt` DESC, web_user_point.`point` DESC
+        <bind name="skip" value="(param.page - 1) * param.size"/>
+        LIMIT #{skip}, #{param.size}
+    </select>
+
+    <select id="pageListCount" resultType="java.lang.Integer">
+        SELECT COUNT(web_user_info.`id`)
+        FROM web_user_info
+        INNER JOIN web_user_point ON web_user_info.`id` = web_user_point.`userId`
+        <where>
+            <if test="param.phoneNumber != null and param.phoneNumber != ''">
+                web_user_info.`phoneNumber` = #{param.phoneNumber}
+            </if>
+            <if test="param.realName != null and param.realName != ''">
+                AND web_user_info.`realName` = #{param.realName}
+            </if>
+            <if test="param.level != null and param.level != ''">
+                AND web_user_point.`level` = #{param.level}
+            </if>
+            AND web_user_info.`deleted` = 0
+        </where>
+    </select>
+</mapper>
